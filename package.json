@@ -1,19 +1,20 @@
 {
-  "name": "electron-umi-antd-pro",
+  "name": "mobileManager",
   "version": "0.0.1",
-  "author": "yaoleia <yaoleia@163.com>",
+  "author": "orionc <t880216t@gmail.com>",
   "private": true,
-  "description": "An out-of-box UI solution for enterprise applications",
+  "description": "",
   "main": "./dist/main/main.js",
   "build": {
     "artifactName": "${productName}-${version}.${ext}",
     "productName": "deviceManager",
-    "appId": "test@163.com",
+    "appId": "t880216t@gmail.com",
     "compression": "maximum",
     "asar": false,
     "directories": {
       "output": "release/${version}"
     },
+    "extraResources": ["./android/extraResources/**"],
     "files": [
       "dist/",
       "node_modules/",

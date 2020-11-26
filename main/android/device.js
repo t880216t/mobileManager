@@ -1,6 +1,5 @@
 const adb = require("adbkit")
 const aport = require('aport')
-// const fetch = require("isomorphic-fetch");
 const fetch = require('electron-fetch').default
 const fs = require("fs");
 const path = require("path");
@@ -9,13 +8,24 @@ const progressStream = require('progress-stream');
 const decompress = require('decompress');
 const decompressTargz = require('decompress-targz');
 var net = require("net");
-const request = require('request');
 
 const {deviceNames} = require('./device_names')
 const {libConfig} = require('./config')
 
 const client = adb.createClient()
-const vendorPath = '/usr/local/var/vendor/'
+function vendorPath() {
+  // if(process.platform == 'darwin'){
+  //   return '/usr/local/var/vendor/'
+  // }
+  // if(process.platform == 'win32'){
+  //   return '/var/vendor/'
+  // }
+  // if(process.platform == 'linux'){
+  //   return 'c://vendor'
+  // }
+  const filepath = path.resolve(__dirname + '/../android/extraResources/')
+  return filepath
+}
 
 async function getprop(device) {
   return client.getProperties(device.id)
@@ -185,7 +195,7 @@ const get_stf_binaries = async () => {
   const version = libConfig.stf_binaries
   const fileName = `stf-binaries-${version}.zip`
   // const filePath = path.resolve(__dirname, 'vendor', fileName)
-  const filePath = vendorPath + fileName
+  const filePath = vendorPath() + '/' + fileName
   if (fs.existsSync(filePath)) return;
   await mirror_download(`https://github.com/openatx/stf-binaries/archive/${version}.zip`, filePath)
 }
@@ -196,7 +206,7 @@ const get_atx_agent= async () => {
   for (var i = 0; i < abiList.length; i++) {
     const fileName = `atx-agent-${version}-${abiList[i]}.tar.gz`
     // const filePath = path.resolve(__dirname, 'vendor', fileName)
-    const filePath = vendorPath + fileName
+    const filePath = vendorPath()+ '/' + fileName
     if (fs.existsSync(filePath)) return;
     await mirror_download(`https://github.com/openatx/atx-agent/releases/download/${version}/atx-agent_${version}_linux_${abiList[i]}.tar.gz`, filePath)
   }
@@ -205,7 +215,7 @@ const get_atx_agent= async () => {
 const get_whatsInput = async () => {
   const fileName = `WhatsInput_v1.0.apk`
   // const filePath = path.resolve(__dirname, 'vendor', fileName)
-  const filePath = vendorPath + fileName
+  const filePath = vendorPath() + '/' + fileName
   if (fs.existsSync(filePath)) return;
   await mirror_download(`https://github.com/openatx/atxserver2-android-provider/releases/download/v0.2.0/WhatsInput_v1.0.apk`, filePath)
 }
@@ -213,7 +223,7 @@ const get_whatsInput = async () => {
 const get_uiautomator_apk = async () => {
   const fileName = `app-uiautomator.apk`
   // const filePath = path.resolve(__dirname, 'vendor', fileName)
-  const filePath = vendorPath + fileName
+  const filePath = vendorPath() + '/' + fileName
   if (fs.existsSync(filePath)) return;
   await mirror_download(`https://github.com/openatx/android-uiautomator-server/releases/download/2.3.1/app-uiautomator.apk`, filePath)
 }
@@ -221,7 +231,7 @@ const get_uiautomator_apk = async () => {
 const get_uiautomator_test_apk = async () => {
   const fileName = `app-uiautomator-test.apk`
   // const filePath = path.resolve(__dirname, 'vendor', fileName)
-  const filePath = vendorPath + fileName
+  const filePath = vendorPath() + '/' + fileName
   if (fs.existsSync(filePath)) return;
   await mirror_download(`https://github.com/openatx/android-uiautomator-server/releases/download/2.3.1/app-uiautomator-test.apk`, filePath)
 }
@@ -235,7 +245,7 @@ const get_apks= async () => {
 async function init_binaries(device){
   const version = libConfig.stf_binaries
   const atx_agent_version = libConfig.atx_agent
-  const zip_folder = `${vendorPath}stf-binaries-${version}/stf-binaries-${version}`
+  const zip_folder = `${vendorPath()}/stf-binaries-${version}/stf-binaries-${version}`
   const preMinicap = zip_folder + "/node_modules/minicap-prebuilt/prebuilt/"
   const preMiniTouch = zip_folder + "/node_modules/minitouch-prebuilt/prebuilt/"
   const minicapSo = preMinicap + device.abi + "/lib/android-" + device.sdk + "/minicap.so"
@@ -259,7 +269,7 @@ async function init_binaries(device){
     console.log("no avaliable abilist", device.abi)
     return
   }
-  const atx_agent_file = `${vendorPath}${abimaps[device.abi]}/atx-agent`
+  const atx_agent_file = `${vendorPath()}/${abimaps[device.abi]}/atx-agent`
   await pushFileToDevice(device, atx_agent_file, '/data/local/tmp/atx-agent')
   await chmodDeviceFile(device, '/data/local/tmp/atx-agent')
 }
