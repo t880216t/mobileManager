@@ -7,10 +7,10 @@
   "main": "./dist/main/main.js",
   "build": {
     "artifactName": "${productName}-${version}.${ext}",
-    "productName": "ManuVision",
-    "appId": "yaoleia@163.com",
+    "productName": "deviceManager",
+    "appId": "test@163.com",
     "compression": "maximum",
-    "asar": true,
+    "asar": false,
     "directories": {
       "output": "release/${version}"
     },
@@ -61,17 +61,12 @@
           ]
         }
       ]
-    },
-    "linux": {
-      "icon": "build/icon.icns",
-      "target": [
-        "deb"
-      ]
     }
   },
   "scripts": {
     "analyze": "cross-env ANALYZE=1 umi build",
-    "build": "yarn build:renderer && yarn build:main && electron-builder -mwl",
+    "build": "yarn build:renderer && yarn build:main && electron-builder --mac",
+    "build:all": "yarn build:renderer && yarn build:main && electron-builder -mwl",
     "build:main": "NODE_ENV=production webpack --config ./build/webpack.main.prod.config.js",
     "build:renderer": "umi build",
     "deploy": "npm run site && npm run gh-pages",
@@ -124,13 +119,14 @@
     "lodash": "^4.17.11",
     "moment": "^2.25.3",
     "omit.js": "^2.0.2",
-    "qs": "^6.9.0",
     "react": "^16.8.6",
+    "react-contextmenu-lite": "^1.0.9",
     "react-dom": "^16.8.6",
     "react-helmet-async": "^1.0.4",
     "umi": "^3.2.14",
     "umi-request": "^1.0.8",
-    "use-merge-value": "^1.0.1"
+    "use-merge-value": "^1.0.1",
+    "xml2map": "^1.0.2"
   },
   "devDependencies": {
     "@ant-design/pro-cli": "^1.0.18",
@@ -149,27 +145,38 @@
     "@umijs/preset-react": "^1.4.8",
     "@umijs/preset-ui": "^2.0.9",
     "@umijs/yorkie": "^2.0.3",
+    "adbkit": "^2.11.1",
+    "aport": "^2.0.0",
     "babel-loader": "^8.1.0",
     "carlo": "^0.9.46",
     "chalk": "^4.0.0",
+    "copy-webpack-plugin": "^6.3.2",
     "cross-env": "^7.0.0",
     "cross-port-killer": "^1.1.1",
+    "decompress": "^4.2.1",
+    "decompress-targz": "^4.1.1",
     "detect-installer": "^1.0.1",
-    "electron": "10.1.2",
+    "electron": "11.0.3",
     "electron-builder": "22.8.1",
     "electron-debug": "3.1.0",
     "electron-devtools-installer": "^3.1.1",
+    "electron-fetch": "^1.7.2",
     "electron-webpack": "2.8.2",
     "enzyme": "^3.11.0",
     "eslint": "^7.1.0",
     "express": "^4.17.1",
+    "extract-zip": "^2.0.1",
     "gh-pages": "^3.0.0",
     "jsdom-global": "^3.0.2",
     "lint-staged": "^10.0.0",
     "mockjs": "^1.0.1-beta3",
+    "node-fetch": "^2.6.1",
     "prettier": "^2.0.1",
     "pro-download": "1.0.1",
+    "progress-stream": "^2.0.0",
     "puppeteer-core": "^5.0.0",
+    "qs": "^6.9.4",
+    "request": "^2.88.2",
     "run-electron": "^1.0.0",
     "stylelint": "^13.0.0",
     "typescript": "^3.9.7",

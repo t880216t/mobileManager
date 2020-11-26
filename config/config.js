@@ -6,8 +6,8 @@ export default defineConfig({
   history: { type: 'hash' },
   hash: true,
   antd: {
-    dark: true,
-    // compact: true,
+    // dark: true,
+    compact: true,
   },
   dva: {
     hmr: true,
@@ -51,13 +51,32 @@ export default defineConfig({
           routes: [
             {
               path: '/',
-              redirect: '/welcome',
+              redirect: '/devicesPage',
             },
             {
-              path: '/welcome',
-              name: 'welcome',
-              icon: 'smile',
-              component: './Welcome',
+              path: '/devicesPage',
+              name: '设备列表',
+              icon: 'ClusterOutlined',
+              routes: [
+                {
+                  path: '/devicesPage',
+                  redirect: '/devicesPage/list',
+                },
+                {
+                  path: '/devicesPage/list',
+                  name: '',
+                  icon: 'mobile',
+                  hideInMenu: true,
+                  component: './DevicesPage',
+                },
+                {
+                  path: '/devicesPage/detail',
+                  name: '设备详情',
+                  icon: 'mobile',
+                  hideInMenu: true,
+                  component: './DevicesPage/DeviceDetail',
+                },
+              ],
             },
             {
               path: '/admin',
@@ -79,6 +98,7 @@ export default defineConfig({
               name: 'list.table-list',
               icon: 'table',
               path: '/list',
+              hideInMenu: true,
               component: './ListTableList',
             },
             {

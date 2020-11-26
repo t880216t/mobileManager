@@ -6,11 +6,12 @@ const proSettings = {
   contentWidth: 'Fluid',
   fixedHeader: false,
   fixSiderbar: true,
+  collapsed: true,
   colorWeak: false,
   menu: {
-    locale: true,
+    locale: false,
   },
-  title: 'ManuVision',
+  title: 'deviceManager',
   pwa: false,
   iconfontUrl: '',
 };
