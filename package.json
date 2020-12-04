@@ -65,7 +65,7 @@
   },
   "scripts": {
     "analyze": "cross-env ANALYZE=1 umi build",
-    "build": "yarn build:renderer && yarn build:main && electron-builder --mac",
+    "build": "yarn build:renderer && yarn build:main && ELECTRON_MIRROR=https://npm.taobao.org/mirrors/electron/ electron-builder --mac",
     "build:all": "yarn build:renderer && yarn build:main && electron-builder -mwl",
     "build:main": "NODE_ENV=production webpack --config ./build/webpack.main.prod.config.js",
     "build:renderer": "umi build",
