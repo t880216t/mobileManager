@@ -24,17 +24,22 @@ function vendorPath() {
   // if(process.platform == 'linux'){
   //   filepath = 'c://vendor'
   // }
-  const filepath = path.join(__dirname, './../extraResources');
-  if (!(fs.existsSync(filepath))) {
-    fs.mkdir(filepath, function (err) {
-      if (err) {
-        console.log('mkdir err:' + err)
-      }
-      console.log('New Directory Created')
-    })
-  } else {
-    console.log('=============')
+  const filepath = path.join(__dirname, './extraResources');
+
+  if (!fs.existsSync(filepath)){
+    fs.mkdirSync(filepath, 0o777);
   }
+
+  // if (!(fs.existsSync(filepath))) {
+  //   fs.mkdir(filepath, function (err) {
+  //     if (err) {
+  //       console.log('mkdir err:' + err)
+  //     }
+  //     console.log('New Directory Created')
+  //   })
+  // } else {
+  //   console.log('=============')
+  // }
   return filepath
 }
 
