@@ -201,7 +201,6 @@ export default class Page extends Component {
 
           try {
             rootNode && rootNode.forEach(node => adaptor(node))
-            console.log(rootNode)
           } finally {
             this.setState({pageNode: rootNode,  currentNode: null, herSpinning: false}, () => {
               this.linstenMouseMoveInDeviceWarp()
@@ -240,7 +239,6 @@ export default class Page extends Component {
     if (pageNode && operation === 'u'){
       const nodePath = getNodePathByXY(pageNode, x, y);
       if (nodePath){
-        console.log('pageNode', pageNode)
         console.log(getXPath(pageNode, nodePath))
         console.log(getXPathLite(pageNode, nodePath))
       }
@@ -462,7 +460,7 @@ export default class Page extends Component {
   mainDeviceCallBack = (resp) => {
     const { address } = this.state;
     if (resp && resp.result){
-      setInterval(() => {
+      setTimeout(() => {
         this.handleHierarchy(address)
       }, 500)
     }
@@ -475,10 +473,7 @@ export default class Page extends Component {
       if (currentNode && syncDevices) {
         syncDevices.forEach(async device => {
           const deviceAddress = `${device.currentIp}:${device.localPort}`
-          const startTime = new Date().getTime()
           clickByNode(deviceAddress, currentNode)
-          const endTime = new Date().getTime()
-          console.log('dur', endTime - startTime)
         })
       }
     }
