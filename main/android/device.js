@@ -7,39 +7,17 @@ const extract = require('extract-zip');
 const progressStream = require('progress-stream');
 const decompress = require('decompress');
 const decompressTargz = require('decompress-targz');
-var net = require("net");
+const net = require("net");
 
 const {deviceNames} = require('./device_names');
 const {libConfig} = require('./config');
 
 const client = adb.createClient();
 function vendorPath() {
-  // let filepath
-  // if(process.platform == 'darwin'){
-  //   filepath = '/usr/local/var/vendor/'
-  // }
-  // if(process.platform == 'win32'){
-  //   filepath = '/var/vendor/'
-  // }
-  // if(process.platform == 'linux'){
-  //   filepath = 'c://vendor'
-  // }
   const filepath = path.join(__dirname, './extraResources');
-
   if (!fs.existsSync(filepath)){
     fs.mkdirSync(filepath, 0o777);
   }
-
-  // if (!(fs.existsSync(filepath))) {
-  //   fs.mkdir(filepath, function (err) {
-  //     if (err) {
-  //       console.log('mkdir err:' + err)
-  //     }
-  //     console.log('New Directory Created')
-  //   })
-  // } else {
-  //   console.log('=============')
-  // }
   return filepath
 }
 
@@ -107,75 +85,13 @@ async function chmodDeviceFile(device, dest ) {
     })
 }
 
-const mirror_download = async (url, filePath) => {
-  const github_host = "https://github.com";
-  if (url.startsWith(github_host)){
-    const mirror_url = url.replace(github_host, "http://tool.appetizer.io");
-    try{
-      return await download(mirror_url, filePath)
-    }catch (e) {
-      console.log("download from mirror error, use origin source")
-    }
-  }
-  return await download(url, filePath);
-};
 
-const download = async (fileURL, filePath) => {
-  //下载保存的文件路径
-  // let fileSavePath = path.join(__dirname, 'vendor', path.basename(fileURL));
-  let fileSavePath = filePath;
-  //缓存文件路径
-  let tmpFileSavePath = fileSavePath + ".tmp";
-  //创建写入流
-  const fileStream = fs.createWriteStream(tmpFileSavePath).on('error', function (e) {
-    console.error('error==>', e)
-  }).on('ready', function () {
-    console.log("开始下载:", fileURL);
-  }).on('finish', function () {
-    //下载完成后重命名文件
-    fs.renameSync(tmpFileSavePath, filePath);
-    console.log('文件下载完成:', filePath);
-    if (filePath.endsWith('.zip')){
-      const zip_folder = filePath.replace('.zip', '');
-      unzip_stf(filePath, zip_folder)
-    }
-    if (filePath.endsWith('.tar.gz')){
-      const zip_folder = filePath.replace('.tar.gz', '');
-      unzip_atx(filePath, zip_folder)
-    }
-  });
-  //请求文件
-  return fetch(fileURL, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/octet-stream' },
-    // timeout: 100,
-  }).then(res => {
-    //获取请求头中的文件大小数据
-    let fsize = res.headers.get("content-length");
-    //创建进度
-    let str = progressStream({
-      length: fsize,
-      time: 100 /* ms */
-    });
-    // 下载进度
-    str.on('progress', function (progressData) {
-      //不换行输出
-      let percentage = Math.round(progressData.percentage) + '%';
-      console.log(percentage);
-      // process.stdout.write('\033[2J'+);
-      // console.log(progress);
-    });
-    res.body.pipe(str).pipe(fileStream);
-  }).catch(e => {
-    //自定义异常处理
-    console.log(e);
-  });
-};
+
 
 const unzip_stf = async (zip_path, unpackPath) => {
-  //判断压缩文件是否存在
+  // 判断压缩文件是否存在
   if(!fs.existsSync(zip_path))  return;
-  //创建解压缩对象
+  // 创建解压缩对象
   try {
     const resolvedUnpackPath = path.resolve(unpackPath);
     console.log('resolvedUnpackPath :', resolvedUnpackPath);
@@ -188,9 +104,9 @@ const unzip_stf = async (zip_path, unpackPath) => {
 };
 
 const unzip_atx = async (zip_path, unpackPath) => {
-  //判断压缩文件是否存在
+  // 判断压缩文件是否存在
   if(!fs.existsSync(zip_path))  return;
-  //创建解压缩对象
+  // 创建解压缩对象
   try {
     const resolvedUnpackPath = path.resolve(unpackPath);
     console.log('resolvedUnpackPath :', resolvedUnpackPath);
@@ -207,11 +123,76 @@ const unzip_atx = async (zip_path, unpackPath) => {
   }
 };
 
+const download = async (fileURL, filePath) => {
+  // 下载保存的文件路径
+  // let fileSavePath = path.join(__dirname, 'vendor', path.basename(fileURL));
+  const fileSavePath = filePath;
+  // 缓存文件路径
+  const tmpFileSavePath = `${fileSavePath  }.tmp`;
+  // 创建写入流
+  const fileStream = fs.createWriteStream(tmpFileSavePath).on('error', function (e) {
+    console.error('error==>', e)
+  }).on('ready', function () {
+    console.log("开始下载:", fileURL);
+  }).on('finish', function () {
+    // 下载完成后重命名文件
+    fs.renameSync(tmpFileSavePath, filePath);
+    console.log('文件下载完成:', filePath);
+    if (filePath.endsWith('.zip')){
+      const zip_folder = filePath.replace('.zip', '');
+      unzip_stf(filePath, zip_folder)
+    }
+    if (filePath.endsWith('.tar.gz')){
+      const zip_folder = filePath.replace('.tar.gz', '');
+      unzip_atx(filePath, zip_folder)
+    }
+  });
+  // 请求文件
+  return fetch(fileURL, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/octet-stream' },
+    // timeout: 100,
+  }).then(res => {
+    // 获取请求头中的文件大小数据
+    const fsize = res.headers.get("content-length");
+    // 创建进度
+    const str = progressStream({
+      length: fsize,
+      time: 100 /* ms */
+    });
+    // 下载进度
+    str.on('progress', function (progressData) {
+      // 不换行输出
+      const percentage = `${Math.round(progressData.percentage)  }%`;
+      console.log(percentage);
+      // process.stdout.write('\033[2J'+);
+      // console.log(progress);
+    });
+    res.body.pipe(str).pipe(fileStream);
+  }).catch(e => {
+    // 自定义异常处理
+    console.log(e);
+  });
+};
+
+const mirror_download = async (url, filePath) => {
+  const github_host = "https://github.com";
+  if (url.startsWith(github_host)){
+    const mirror_url = url.replace(github_host, "http://tool.appetizer.io");
+    try{
+      return await download(mirror_url, filePath)
+    }catch (e) {
+      console.log("download from mirror error, use origin source")
+    }
+  }
+  return await download(url, filePath);
+};
+
 const get_stf_binaries = async () => {
   const version = libConfig.stf_binaries;
   const fileName = `stf-binaries-${version}.zip`;
   // const filePath = path.resolve(__dirname, 'vendor', fileName)
-  const filePath = vendorPath() + '/' + fileName;
+  const filePath = `${vendorPath()  }/${  fileName}`;
   if (fs.existsSync(filePath)) return;
   await mirror_download(`https://github.com/openatx/stf-binaries/archive/${version}.zip`, filePath)
 };
@@ -219,10 +200,10 @@ const get_stf_binaries = async () => {
 const get_atx_agent= async () => {
   const version = libConfig.atx_agent;
   const abiList = ["386", "amd64", "armv6", "armv7"];
-  for (var i = 0; i < abiList.length; i++) {
+  for (let i = 0; i < abiList.length; i++) {
     const fileName = `atx-agent-${version}-${abiList[i]}.tar.gz`;
     // const filePath = path.resolve(__dirname, 'vendor', fileName)
-    const filePath = vendorPath() + '/' + fileName;
+    const filePath = `${vendorPath()  }/${  fileName}`;
     if (fs.existsSync(filePath)) return;
     await mirror_download(`https://github.com/openatx/atx-agent/releases/download/${version}/atx-agent_${version}_linux_${abiList[i]}.tar.gz`, filePath)
   }
@@ -231,7 +212,7 @@ const get_atx_agent= async () => {
 const get_whatsInput = async () => {
   const fileName = `WhatsInput_v1.0.apk`;
   // const filePath = path.resolve(__dirname, 'vendor', fileName)
-  const filePath = vendorPath() + '/' + fileName;
+  const filePath = `${vendorPath()  }/${  fileName}`;
   if (fs.existsSync(filePath)) return;
   await mirror_download(`https://github.com/openatx/atxserver2-android-provider/releases/download/v0.2.0/WhatsInput_v1.0.apk`, filePath)
 };
@@ -239,7 +220,7 @@ const get_whatsInput = async () => {
 const get_uiautomator_apk = async () => {
   const fileName = `app-uiautomator.apk`;
   // const filePath = path.resolve(__dirname, 'vendor', fileName)
-  const filePath = vendorPath() + '/' + fileName;
+  const filePath = `${vendorPath()  }/${  fileName}`;
   if (fs.existsSync(filePath)) return;
   await mirror_download(`https://github.com/openatx/android-uiautomator-server/releases/download/2.3.1/app-uiautomator.apk`, filePath)
 };
@@ -247,7 +228,7 @@ const get_uiautomator_apk = async () => {
 const get_uiautomator_test_apk = async () => {
   const fileName = `app-uiautomator-test.apk`;
   // const filePath = path.resolve(__dirname, 'vendor', fileName)
-  const filePath = vendorPath() + '/' + fileName;
+  const filePath = `${vendorPath()  }/${  fileName}`;
   if (fs.existsSync(filePath)) return;
   await mirror_download(`https://github.com/openatx/android-uiautomator-server/releases/download/2.3.1/app-uiautomator-test.apk`, filePath)
 };
@@ -262,11 +243,11 @@ async function init_binaries(device){
   const version = libConfig.stf_binaries;
   const atx_agent_version = libConfig.atx_agent;
   const zip_folder = `${vendorPath()}/stf-binaries-${version}/stf-binaries-${version}`;
-  const preMinicap = zip_folder + "/node_modules/minicap-prebuilt/prebuilt/";
-  const preMiniTouch = zip_folder + "/node_modules/minitouch-prebuilt/prebuilt/";
-  const minicapSo = preMinicap + device.abi + "/lib/android-" + device.sdk + "/minicap.so";
-  const minicap = preMinicap + device.abi + "/bin/minicap";
-  const minitouch = preMiniTouch + device.abi + "/bin/minitouch";
+  const preMinicap = `${zip_folder  }/node_modules/minicap-prebuilt/prebuilt/`;
+  const preMiniTouch = `${zip_folder  }/node_modules/minitouch-prebuilt/prebuilt/`;
+  const minicapSo = `${preMinicap + device.abi  }/lib/android-${  device.sdk  }/minicap.so`;
+  const minicap = `${preMinicap + device.abi  }/bin/minicap`;
+  const minitouch = `${preMiniTouch + device.abi  }/bin/minitouch`;
   await pushFileToDevice(device, minicapSo, '/data/local/tmp/minicap.so');
   await chmodDeviceFile(device, '/data/local/tmp/minicap.so');
   await pushFileToDevice(device, minicap, '/data/local/tmp/minicap');
@@ -347,8 +328,8 @@ async function init_forwards(device, freePort) {
 }
 
 async function createTcpProxy(localport, remotehost, remoteport){
-  let server = net.createServer(function (localsocket) {
-    let remotesocket = new net.Socket();
+  const server = net.createServer(function (localsocket) {
+    const remotesocket = new net.Socket();
 
     remotesocket.connect(remoteport, remotehost);
 
@@ -361,7 +342,7 @@ async function createTcpProxy(localport, remotehost, remoteport){
     });
 
     localsocket.on('data', function (data) {
-      let flushed = remotesocket.write(data);
+      const flushed = remotesocket.write(data);
       if (!flushed) {
         localsocket.pause();
       }
@@ -370,7 +351,7 @@ async function createTcpProxy(localport, remotehost, remoteport){
     remotesocket.on('data', function(data) {
       try{
         if (localsocket){
-          let flushed = localsocket.write(data);
+          const flushed = localsocket.write(data);
           if (!flushed) {
             remotesocket.pause();
           }
@@ -433,9 +414,9 @@ async function init(device) {
   const localPort = await init_forwards(device, freePort);
   await stopAgent(device);
   await startAgent(device);
-  device['port'] = freePort;
-  device['localPort'] = localPort;
-  device['currentIp'] = currentIp;
+  device.port = freePort;
+  device.localPort = localPort;
+  device.currentIp = currentIp;
   return device
 }
 
@@ -444,20 +425,20 @@ const serial = async (device) => {
   const {width, height} = await getScreenSize(device);
   console.log(properties);
   let newDevice = properties;
-  newDevice['id'] = device.id;
-  newDevice['type'] = device.type;
-  newDevice['width'] = width;
-  newDevice['height'] = height;
+  newDevice.id = device.id;
+  newDevice.type = device.type;
+  newDevice.width = width;
+  newDevice.height = height;
   newDevice = await init(newDevice);
   return newDevice
 };
 
 async function getIPAdress() {
-  var interfaces = require('os').networkInterfaces();
-  for (var devName in interfaces) {
-    var iface = interfaces[devName];
-    for (var i = 0; i < iface.length; i++) {
-      var alias = iface[i];
+  const interfaces = require('os').networkInterfaces();
+  for (const devName in interfaces) {
+    const iface = interfaces[devName];
+    for (let i = 0; i < iface.length; i++) {
+      const alias = iface[i];
       if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
         return alias.address;
       }
