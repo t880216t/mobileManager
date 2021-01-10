@@ -14,6 +14,10 @@ export default {
         '^': '',
       },
     },
+    '/socket.io': {
+      target: "http://localhost:5000",
+      ws: false,
+    },
   },
   test: {
     '/api/': {

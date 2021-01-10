@@ -8,8 +8,9 @@ import DeviceCard from './components/DeviceCard'
 import styles from './index.less'
 
 
-@connect(({ global, loading }) => ({
+@connect(({ global, wsSocket, loading }) => ({
   global,
+  wsSocket,
   loading: loading.models.global,
 }))
 export default class Page extends Component {
