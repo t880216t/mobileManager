@@ -51,7 +51,7 @@ export default defineConfig({
           routes: [
             {
               path: '/',
-              redirect: '/devicesPage',
+              redirect: '/test',
             },
             {
               path: '/devicesPage',
@@ -100,6 +100,12 @@ export default defineConfig({
               path: '/list',
               hideInMenu: true,
               component: './ListTableList',
+            },
+            {
+              name: 'haodong',
+              icon: 'table',
+              path: '/test',
+              component: './StockEvent',
             },
             {
               component: './404',

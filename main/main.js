@@ -36,8 +36,8 @@ function createWindow() {
   }
 
   mainWindow.webContents.on('did-finish-load', function () {
-    initSystem()
-    device_watch(mainWindow.webContents)
+    // initSystem()
+    // device_watch(mainWindow.webContents)
   })
 
   ipcMain.on('toMain', function(event, common, message) {

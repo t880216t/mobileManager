@@ -65,8 +65,8 @@
   },
   "scripts": {
     "analyze": "cross-env ANALYZE=1 umi build",
-    "build": "yarn build:renderer && yarn build:main && ELECTRON_MIRROR=https://npm.taobao.org/mirrors/electron/ electron-builder --mac",
-    "build:all": "yarn build:renderer && yarn build:main && ELECTRON_MIRROR=https://npm.taobao.org/mirrors/electron/ electron-builder -mwl",
+    "build": "yarn build:renderer && yarn build:main electron-builder --mac",
+    "build:all": "yarn build:renderer && yarn build:main electron-builder -mwl",
     "build:main": "NODE_ENV=production webpack --config ./build/webpack.main.prod.config.js",
     "build:renderer": "umi build",
     "deploy": "npm run site && npm run gh-pages",
@@ -123,6 +123,7 @@
     "moment": "^2.25.3",
     "omit.js": "^2.0.2",
     "react": "^16.8.6",
+    "react-big-calendar": "^0.33.2",
     "react-contextmenu-lite": "^1.0.9",
     "react-dom": "^16.8.6",
     "react-helmet-async": "^1.0.4",
